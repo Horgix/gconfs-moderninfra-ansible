@@ -1,0 +1,23 @@
+---
+- name: "Marathon - Start"
+  docker_container:
+    name:     marathon
+    image:    mesoscloud/marathon
+    state:    started
+    network_mode: host
+    # CF /usr/bin/marathon, l.98 for the reason of this ulimit
+    ulimits:
+      - "nofile:8192"
+    ports:
+      - "8080:8080"
+    labels:
+      #traefik.enable:           "false"
+      traefik.port:           "8080"
+      traefik.backend:        "marathon"
+      traefik.frontend.rule:  "Host:marathon.{{ instance_hostname }}"
+    env:
+      MARATHON_HOSTNAME:          "{{ instance_hostname }}"
+      MARATHON_HTTP_ADDRESS:      "0.0.0.0"
+      MARATHON_HTTP_CREDENTIALS:  "{{ marathon.username }}:{{ marathon.password }}"
+      MARATHON_ZK:                "zk://{{ zk_nodes_with_port }}/marathon"
+      MARATHON_MASTER:            "zk://{{ zk_nodes_with_port }}/mesos"

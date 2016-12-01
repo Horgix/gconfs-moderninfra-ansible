@@ -1,0 +1,8 @@
+[all]
+# Do not try to do anything with that, it's just an AWS instance that will get
+# destroyed after usage, so you just risk ruining someone else day if you try
+# anything on it
+52.212.111.12
+
+[misc]
+localhost transport=local ansible_become=no

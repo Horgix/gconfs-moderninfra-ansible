@@ -1,0 +1,14 @@
+---
+- name: "Base setup"
+  hosts: 52.212.111.12
+  roles:
+    - base
+  tags:
+    - base
+
+- name: "Setup Services"
+  hosts: 52.212.111.12
+  roles:
+    - services
+  tags:
+    - services

@@ -1,0 +1,28 @@
+---
+- name: "Set Zookeeper Nodes fact"
+  set_fact:
+    zk_nodes: "1:52.212.111.12"
+    zk_nodes_with_port: "52.212.111.12:2181"
+  tags:
+    - always
+
+- name: "Configure requirements"
+  include: requirements.yml
+  tags:
+    - requirements
+
+- name: "Configure Zookeeper"
+  include: zookeeper.yml
+  tags:
+    - zookeeper
+    - zk
+
+- name: "Configure Mesos"
+  include: mesos.yml
+  tags:
+    - mesos
+
+- name: "Configure Marathon"
+  include: marathon.yml
+  tags:
+    - marathon

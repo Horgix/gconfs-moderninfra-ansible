@@ -1,0 +1,50 @@
+---
+- name: "Create Gitlab Group"
+  delegate_to: 127.0.0.1
+  gitlab_group:
+    server_url:       "{{ gitlab.endpoint }}"
+    #validate_certs:   true
+    login_token:      "{{ gitlab_private_token }}"
+    name:             gconfs
+    state:            present
+
+- name: "Create Gitlab User"
+  delegate_to: 127.0.0.1
+  gitlab_user:
+    server_url:       "{{ gitlab.endpoint }}"
+    #validate_certs:   true
+    login_token:      "{{ gitlab_private_token }}"
+    name:             GConfs demo
+    username:         horgix
+    password:         "{{ gitlab.horgix_password }}"
+    group:            gconfs
+    access_level:     owner
+    email:            alexis.horgix.chotard+gconfsdemo@gmail.com
+    state:            present
+
+- name: "Create Gitlab Project"
+  delegate_to: 127.0.0.1
+  gitlab_project:
+    server_url:       "{{ gitlab.endpoint }}"
+    #validate_certs:   true
+    login_token:      "{{ gitlab_private_token }}"
+    name:             demo
+    group:            gconfs
+    description:      Click Count application
+    import_url:       "https://github.com/Horgix/click-count-app.git"
+    state:            present
+
+- name: "Set variables"
+  uri:
+    url:          "{{ gitlab.endpoint }}/api/v3/projects/gconfs%2Fdemo/variables"
+    method:       POST
+    body:         "{{ item }}"
+    status_code:  "200,201,400"
+    HEADER_Content-Type:  "application/x-www-form-urlencoded"
+    HEADER_PRIVATE-TOKEN: "{{ gitlab_private_token }}"
+  with_items:
+    - "key=HUB_LOGIN&value={{ docker_hub.username }}"
+    - "key=HUB_PASSWORD&value={{ docker_hub.password }}"
+    - "key=MARATHON_URL&value={{ marathon.endpoint }}"
+    - "key=MARATHON_USERNAME&value={{ marathon.username }}"
+    - "key=MARATHON_PASSWORD&value={{ marathon.password }}"

@@ -1,0 +1,36 @@
+---
+- name: "Create volumes directories"
+  file:
+    path:   /srv/traefik-marathon
+    state:  directory
+    owner:  root
+    group:  root
+    mode:   0755
+
+- name: "Make sure acme.json exists"
+  file:
+    path:   /srv/traefik-marathon/acme.json
+    state:  touch
+    owner:  root
+    group:  root
+    mode:   0640
+  changed_when: False
+
+- name: "Configure"
+  template:
+    src:    traefik.toml.j2
+    dest:   /srv/traefik-marathon/traefik.toml
+    owner:  root
+    group:  root
+    mode:   0644
+
+- name: "Run Marathon app"
+  uri:
+    url:          "{{ marathon.endpoint }}/v2/apps/traefik"
+    method:       PUT
+    body:         '{{ lookup("template", "traefik_marathon_app.json.j2") }}'
+    body_format:  json
+    status_code:  "100,200,201,204"
+    user:         "{{ marathon.username }}"
+    password:     "{{ marathon.password }}"
+    HEADER_Content-Type:  "application/json"

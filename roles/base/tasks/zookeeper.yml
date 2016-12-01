@@ -1,0 +1,16 @@
+---
+- name: "Zookeeper - Start"
+  docker_container:
+    name:         zookeeper
+    image:        horgix/zookeeper
+    state:        started
+    network_mode: host
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    labels:
+      traefik.enable: "false"
+    env:
+      MYID:     "1"
+      SERVERS:  "{{ zk_nodes }}"

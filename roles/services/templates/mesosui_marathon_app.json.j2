@@ -1,0 +1,41 @@
+{
+  "id": "mesos-ui",
+  "instances": 1,
+  "cpus": 0.2,
+  "mem": 512,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "capgemini/mesos-ui:standalone-latest",
+      "network": "BRIDGE",
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "hostPort": 0,
+          "protocol": "tcp",
+          "name": "webui"
+        }
+      ]
+    }
+  },
+  "env": {
+    "ZOOKEEPER_ADDRESS": "{{ zk_nodes_with_port }}"
+  },
+  "healthChecks": [
+    {
+      "gracePeriodSeconds": 300,
+      "intervalSeconds": 60,
+      "maxConsecutiveFailures": 3,
+      "path": "/",
+      "portIndex": 0,
+      "protocol": "HTTP",
+      "timeoutSeconds": 20
+    },
+  ],
+  "labels": {
+    "traefik.enable": "true",
+    "traefik.backend": "mesosui",
+    "traefik.frontend.rule": "Host:cluster.{{ domain_name }}",
+    "traefik.portIndex": "0"
+  }
+}

@@ -1,0 +1,27 @@
+---
+- name: "GitLab Runner - Get runners token"
+  uri:
+    url:          "{{ gitlab.endpoint }}/api/v3/projects/gconfs%2Fdemo"
+    method:       GET
+    status_code:  "100,200,201,204"
+    HEADER_PRIVATE-TOKEN:  "{{ gitlab_private_token }}"
+  register: api_project
+  tags:
+    - token
+
+- name: "GitLab Runner - Set runners token as fact"
+  set_fact:
+    gitlab_runners_token:  "{{ api_project['json']['runners_token'] }}"
+  tags:
+    - token
+
+- name: "Runner - Run Marathon app"
+  uri:
+    url:          "{{ marathon.endpoint }}/v2/apps/gitlab-runner"
+    method:       PUT
+    body:         '{{ lookup("template", "gitlab_runner_marathon_app.json.j2") }}'
+    body_format:  json
+    status_code:  "100,200,201,204"
+    user:         "{{ marathon.username }}"
+    password:     "{{ marathon.password }}"
+    HEADER_Content-Type:  "application/json"
